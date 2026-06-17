@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #0b0f19;
+  color: #f3f4f6;
+  overflow-x: hidden;
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(17, 24, 39, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-glow {
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.15);
+}
+
+.glow-purple {
+  box-shadow: 0 0 50px -10px rgba(139, 92, 246, 0.4);
+}
+
+.glow-blue {
+  box-shadow: 0 0 50px -10px rgba(59, 130, 246, 0.4);
+}
+
+/* Custom glow text */
+.glow-text {
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+/* Animations */
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.08);
+  }
+}
+
+.animate-glow {
+  animation: pulseGlow 8s infinite ease-in-out;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0f19;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8b5cf6;
+}

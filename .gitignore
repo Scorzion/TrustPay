@@ -1,0 +1,14 @@
+node_modules/
+.env
+.env.*
+target/
+cache/
+artifacts/contracts/
+artifacts/build-info/
+frontend/dist/
+frontend/node_modules/
+backend-ts/node_modules/
+backend-ts/dist/
+backend-ts/prisma/dev.db
+backend-ts/prisma/dev.db-journal
+node_modules

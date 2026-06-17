@@ -1,0 +1,18 @@
+{
+  "name": "trustpay-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for TrustPay distributed escrow",
+  "scripts": {
+    "test": "npx hardhat test",
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat run scripts/deploy.js",
+    "node": "npx hardhat node"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "hardhat": "^2.19.1"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.3"
+  }
+}

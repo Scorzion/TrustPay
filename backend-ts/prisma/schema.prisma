@@ -1,0 +1,128 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  BUYER
+  FREELANCER
+  ADMIN
+}
+
+enum EscrowStatus {
+  CREATED
+  FUNDED
+  IN_PROGRESS
+  SUBMITTED
+  RELEASED
+  DISPUTED
+  RESOLVED
+}
+
+enum MilestoneStatus {
+  CREATED
+  FUNDED
+  SUBMITTED
+  RELEASED
+}
+
+enum JobStatus {
+  OPEN
+  ACTIVE
+  COMPLETED
+}
+
+model User {
+  id                Int                 @id @default(autoincrement())
+  walletAddress     String              @unique @map("wallet_address")
+  role              Role                @default(BUYER)
+  reputationScore   Float               @default(5.0) @map("reputation_score")
+  createdJobs       Job[]               @relation("CreatedJobs")
+  assignedJobs      Job[]               @relation("AssignedJobs")
+  buyerEscrows      Escrow[]            @relation("BuyerEscrows")
+  freelancerEscrows Escrow[]            @relation("FreelancerEscrows")
+  reputationLogs    ReputationHistory[]
+  auditLogs         AuditLog[]
+
+  @@map("users")
+}
+
+model Job {
+  id           Int       @id @default(autoincrement())
+  title        String
+  description  String
+  budget       Decimal   @db.Decimal(20, 8)
+  creatorId    Int       @map("creator_id")
+  creator      User      @relation("CreatedJobs", fields: [creatorId], references: [id])
+  freelancerId Int?      @map("freelancer_id")
+  freelancer   User?     @relation("AssignedJobs", fields: [freelancerId], references: [id])
+  status       JobStatus @default(OPEN)
+  escrow       Escrow?
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@map("jobs")
+}
+
+model Escrow {
+  id           Int          @id @default(autoincrement())
+  onchainId    Int?         @unique @map("onchain_id")
+  status       EscrowStatus @default(CREATED)
+  buyerId      Int          @map("buyer_id")
+  buyer        User         @relation("BuyerEscrows", fields: [buyerId], references: [id])
+  freelancerId Int          @map("freelancer_id")
+  freelancer   User         @relation("FreelancerEscrows", fields: [freelancerId], references: [id])
+  jobId        Int          @unique @map("job_id")
+  job          Job          @relation(fields: [jobId], references: [id])
+  balance      Decimal      @default(0.0) @db.Decimal(20, 8)
+  txHash       String?      @map("tx_hash")
+  version      Int          @default(1)
+  milestones   Milestone[]
+  auditLogs    AuditLog[]
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  @@map("escrows")
+}
+
+model Milestone {
+  id        Int             @id @default(autoincrement())
+  escrowId  Int             @map("escrow_id")
+  escrow    Escrow          @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+  title     String
+  amount    Decimal         @db.Decimal(20, 8)
+  status    MilestoneStatus @default(CREATED)
+  createdAt DateTime        @default(now()) @map("created_at")
+
+  @@map("milestones")
+}
+
+model AuditLog {
+  id            Int      @id @default(autoincrement())
+  escrowId      Int      @map("escrow_id")
+  escrow        Escrow   @relation(fields: [escrowId], references: [id])
+  previousState String   @map("previous_state")
+  newState      String   @map("new_state")
+  actorId       Int?     @map("actor_id")
+  actor         User?    @relation(fields: [actorId], references: [id])
+  actorRole     String   @map("actor_role")
+  txHash        String?  @map("tx_hash")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+}
+
+model ReputationHistory {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+  escrowId    Int      @map("escrow_id")
+  scoreChange Float    @map("score_change")
+  type        String   // COMPLETION | DISPUTE_LOSS | DISPUTE_WIN
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("reputation_history")
+}
